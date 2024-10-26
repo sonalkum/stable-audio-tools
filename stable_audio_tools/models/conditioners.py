@@ -270,6 +270,7 @@ class T5Conditioner(Conditioner):
         super().__init__(self.T5_MODEL_DIMS[t5_model_name], output_dim, project_out=project_out)
         
         from transformers import T5EncoderModel, AutoTokenizer
+        from huggingface_hub import hf_hub_download
 
         self.max_length = max_length
         self.enable_grad = enable_grad
@@ -283,7 +284,10 @@ class T5Conditioner(Conditioner):
                 # self.tokenizer = T5Tokenizer.from_pretrained(t5_model_name, model_max_length = max_length)
                 # model = T5EncoderModel.from_pretrained(t5_model_name, max_length=max_length).train(enable_grad).requires_grad_(enable_grad)
                 self.tokenizer = AutoTokenizer.from_pretrained(t5_model_name)
-                ckpt = torch.load('./try_t5.pt')
+                # ckpt = torch.load('./try_t5.pt')
+                ckpt = hf_hub_download(repo_id='sonalkum/synthio-t5', filename='try_t5.pt')
+                ckpt = torch.load(ckpt)
+                
                 model = T5EncoderModel.from_pretrained(t5_model_name).train(enable_grad).requires_grad_(enable_grad).to(torch.float16)
                 model.load_state_dict(ckpt,strict=True)
 
